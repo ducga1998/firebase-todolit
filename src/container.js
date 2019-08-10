@@ -1,8 +1,31 @@
-import Container from 'unstated-x'
+import {Container} from 'unstated-x'
+import firebase from './config'
 class TodoContainer extends Container {
-    todo = []
-    constructor(){
-        
-    }
+   state = {
+    todo :  []
+    
+   }
+   constructor(state){   
+       super(state)
+       
+   
+   }
+    writeUserData = ( name, done, dueTime) =>  {
+    const todoRef = firebase.database().ref('todolist')
+    const newtodoRef = todoRef.push();
+    newtodoRef.set({
+      name,
+      done,
+      dueTime 
+  });
+  }
+   async getTodoData(){
+    await firebase.database().ref('/todolist').once('value').then((snapshot)  => {
+        var todo =Object.values(snapshot.val())
+        this.setState({todo })
+      });
+   }
 }
-const todoContainer =  new TodoContainer()
+
+export const todoContainer =  new TodoContainer()
+window.todoContainer = todoContainer
