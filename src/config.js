@@ -4,8 +4,7 @@ import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/database"
-
-const  firebaseInstance  = (async () => {
+ (async () => {
     const firebaseConfig = {
       apiKey: "AIzaSyCe4cMlbPBEXnslEZImJmXipWbnk2mfBV4",
       authDomain: "todolit.firebaseapp.com",
