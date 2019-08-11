@@ -2,6 +2,7 @@ import {
     Container
 } from 'unstated-x'
 import firebase from './config'
+const database   = firebase.database()
 class TodoContainer extends Container {
     state = {
         todo: []
@@ -9,11 +10,9 @@ class TodoContainer extends Container {
     }
     constructor(state) {
         super(state)
-
-
     }
     addItem = (name, done, dueTime) => {
-        const todoRef = firebase.database().ref('todolist')
+        const todoRef = database.ref('todolist')
         const newtodoRef = todoRef.push();
         const todoItem = {
             name,
@@ -24,8 +23,18 @@ class TodoContainer extends Container {
         newtodoRef.set(todoItem);
         this.setState({todo : [...this.state.todo , ...[itemContainer] ]})
     }
+    deleteItem(id){
+        this.setState({todo : this.state.todo.filter(todoItem => todoItem.state.id !== id ) }, ()  => {
+            database.ref('/todolist/'+id).remove()
+        })
+        console.log('click')
+    }
+    setDueDate(){
+
+    }
+    
     async getTodoData() {
-        const spanshot = await firebase.database().ref('/todolist').once('value')
+        const spanshot = await database.ref('/todolist').once('value')
         // console.log('todoList',todoList)
         const todoList  =spanshot.val()
         const todo = Object.keys(todoList).map(id => {
@@ -50,7 +59,7 @@ class ItemContainer extends Container  {
     }
     changeName  = (name,id) => {
         this.setState({name},()  => {
-         firebase.database().ref(`/todolist/${id}`).set({
+         database.ref(`/todolist/${id}`).set({
              name
          })
         })
