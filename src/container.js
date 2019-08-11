@@ -2,7 +2,7 @@ import {
     Container
 } from 'unstated-x'
 import firebase from './config'
-const database   = firebase.database()
+const database = firebase.database()
 class TodoContainer extends Container {
     state = {
         todo: []
@@ -19,56 +19,89 @@ class TodoContainer extends Container {
             done,
             dueTime
         }
-        const itemContainer  = new ItemContainer(todoItem)
+        const itemContainer = new ItemContainer(todoItem)
         newtodoRef.set(todoItem);
-        this.setState({todo : [...this.state.todo , ...[itemContainer] ]})
-    }
-    deleteItem(id){
-        this.setState({todo : this.state.todo.filter(todoItem => todoItem.state.id !== id ) }, ()  => {
-            database.ref('/todolist/'+id).remove()
+        this.setState({
+            todo: [...this.state.todo, ...[itemContainer]]
         })
-        console.log('click')
     }
-    setDueDate(){
+    deleteItem(id) {
+        const check = window.confirm('are you make sure delete')
+        if (check) {
+            this.setState({
+                todo: this.state.todo.filter(todoItem => todoItem.state.id !== id)
+            }, () => {
+                database.ref('/todolist/' + id).remove()
+            })
+        }
 
     }
-    
+    setDueDate() {
+
+    }
+
     async getTodoData() {
         const spanshot = await database.ref('/todolist').once('value')
         // console.log('todoList',todoList)
-        const todoList  =spanshot.val()
+        const todoList = spanshot.val()
         const todo = Object.keys(todoList).map(id => {
-            const  {name , done, dueTime}  = todoList[id]
-            return new ItemContainer({name , done, dueTime , id  })
+            const {
+                name,
+                done,
+                dueTime
+            } = todoList[id]
+            return new ItemContainer({
+                name,
+                done,
+                dueTime,
+                id
+            })
         })
         this.setState({
-                todo
+            todo
         })
     }
 }
-class ItemContainer extends Container  {
-    state = {
-        id : '',
-        name : '',
-        done : false,
-        dueTime : '10/21/2019'
-    }
-    constructor(state){
+class ItemContainer extends Container {
+   
+    constructor(state) {
         super(state)
         this.state = state
     }
-    changeName  = (name,id) => {
-        this.setState({name},()  => {
-         database.ref(`/todolist/${id}`).set({
-             name
-         })
+    state = {
+        id: '',
+        name: '',
+        done: false,
+        dueTime: '10/21/2019'
+    }
+    changeName = (name) => { 
+        const  {done, dueTime,id} = this.state
+        console.log('container todo',this.state)
+        this.setState({
+            name
+        }, () => {
+            database.ref(`/todolist/${id}`).set({
+                name,dueTime,done
+            })
         })
     }
-        
+    changeDueDate = (dueTime) => {
+        const  {done,id,name} = this.state
+        console.log('container todo changeDueDate ',this.state)
+        this.setState({
+            dueTime
+        }, () => {
+            database.ref(`/todolist/${id}`).set({
+                name,dueTime,done
+            })
+        })
+    }
+
 }
+
 const reg = new Map()
-class BaseContainer extends Container{
-    constructor(state){
+class BaseContainer extends Container {
+    constructor(state) {
         super(state)
         reg.set()
     }

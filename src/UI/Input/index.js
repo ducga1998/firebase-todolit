@@ -46,6 +46,7 @@ const UIInput = React.forwardRef((props, ref) => {
             type={type || 'text'}
             disabled={!!disabled}
             placeholder={placeholder}
+            
             onChange={onChange ? (e => onChange(e.target.value)) : undefined}
             {...passProps}
         />
