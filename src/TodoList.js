@@ -17,19 +17,10 @@ class TodoList extends React.Component {
   };
   componentDidMount = () => {
     todoContainer.getTodoData();
-    var connectedRef = firebase.database().ref(".info/connected");
-    connectedRef.on("value", function(snap) {
-      // if (snap.val() === true) {
-      //   alert("connected");
-      // } else {
-      //   alert("not connected");
-      // }
-    });
   };
   componentDidUpdate(){
     todoContainer.getTodoData();
   }
-  onChangeDueDate = () => {};
   onClickAdd = async () => {
     await todoContainer.addItem(this.state.newName, false, '');
     this.setState({ newName: "" });
@@ -155,6 +146,12 @@ const Layout = styled.div`
 `;
 const ButtonGroup = styled.div`
   display: flex;
+  align-items  : center;
+  button {
+      margin : 4px;
+      font-size : 10px;
+      padding : 2px;
+  }
   svg {
     cursor: pointer;
   }
