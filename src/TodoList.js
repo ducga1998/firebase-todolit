@@ -3,16 +3,17 @@ import firebase from "./config";
 import { todoContainer } from "./container";
 import { Subscribe, Provider } from "unstated-x";
 import styled from "styled-components";
-import { StyledListTitle, StyledList } from "./UI/UIItem";
 import { ThemeProvider } from "styled-components";
 import UIInput from "./UI/Input";
 import theme from "./theme";
 import UIIcon from "./UI/Icon";
 import DatePicker from "./UI/DatePicker";
+import { PrimaryButton ,SuccessButton, DangerButton} from "./UI/Button";
 class TodoList extends React.Component {
   state = {
     newName: "",
-    isOpenDatePicker: false
+    isOpenDatePicker: false,
+    active: "All"
   };
   componentDidMount = () => {
     todoContainer.getTodoData();
@@ -28,95 +29,121 @@ class TodoList extends React.Component {
 
   onChangeDueDate = () => {};
   onClickAdd = async () => {
-    await todoContainer.addItem(this.state.newName, false, "10/21/2019");
+    await todoContainer.addItem(this.state.newName, false, '');
     this.setState({ newName: "" });
   };
   render() {
+    const { active } = this.state;
+    
     return (
-      <ThemeProvider theme={theme}>
-        <Provider>
-          <Subscribe to={[todoContainer]}>
-            {() => {
-              const { todo } = todoContainer.state;
+      <Background>
+        <ThemeProvider theme={theme}>
+          <Provider>
+            <Subscribe to={[todoContainer]}>
+              {() => {
+                const { todo } = todoContainer.state;
 
-              return (
-                <Wrapper>
-                  {todo &&
-                    todo.map((todoItemContainer, key) => {
-                      return (
-                        <Subscribe to={[todoItemContainer]} key={key}>
-                          {() => {
-                            const {
-                              name,
-                              id,
-                              dueTime
-                            } = todoItemContainer.state;
-                            return (
-                              <Layout>
-                                <UIInput
-                                  value={name}
-                                  onChange={name =>
-                                    todoItemContainer.changeName(name)
-                                  }
-                                />
-                                <ButtonGroup>
-                                  <UIIcon
-                                    onClick={() => todoContainer.deleteItem(id)}
-                                    icon="binCompact"
-                                    size="large"
-                                  />
-                                  <DatePicker
-                                    date={dueTime}
-                                    trigger={
-                                      <UIIcon icon="clock" size="large" />
-                                    }
-                                    onChange={date => {
-                                      todoItemContainer.changeDueDate(date);
-                                    }}
-                                  />
-                                </ButtonGroup>
-                              </Layout>
-                            );
-                          }}
-                        </Subscribe>
-                      );
-                    })}
-                </Wrapper>
-              );
-            }}
-          </Subscribe>
-          <ButtonGroup>
-            <UIInput
-              value={this.state.newName}
-              placeholder="Add Name "
-              onChange={newName => this.setState({ newName })}
-              onKeyPress={event => {
-                if (event.which === 13) {
-                  this.onClickAdd();
-                  event.target.value = "";
-                }
+                return (
+                  <Wrapper>
+                    <div>
+                      {["All", "Done", "DoNot"].map(item => (
+                        <PrimaryButton
+                          active={item === active}
+                          onClick={() => this.setState({ active: item })}
+                        >
+                          {item}
+                        </PrimaryButton>
+                      ))}
+                    </div>
+                    {todo &&
+                      todo
+                        .filter(todoItemContainer => {
+                          const { done } = todoItemContainer.state;
+                          if (active === "All") return true;
+                          if (active === "Done") return done;
+                          if (active === "DoNot") return !done;
+                        })
+                        .map((todoItemContainer, key) => {
+                          return (
+                            <Subscribe to={[todoItemContainer]} key={key}>
+                              {() => {
+                                  const {
+                                    name,
+                                    id,
+                                    dueTime,
+                                    done
+                                  } = todoItemContainer.state;
+                                const ButtonWork  = done ?SuccessButton :  DangerButton 
+                                
+                                return (
+                                  <Layout>
+                                    <UIInput
+                                      value={name}
+                                      onChange={name =>
+                                        todoItemContainer.changeName(name)
+                                      }
+                                    />
+                                    <ButtonGroup>
+                                      <UIIcon
+                                        onClick={() =>
+                                          todoContainer.deleteItem(id)
+                                        }
+                                        icon="binCompact"
+                                        size="large"
+                                      />
+                                     {dueTime.length ?  <DatePicker
+                                        date={dueTime}
+                                        trigger={
+                                          <UIIcon icon="clock" size="large" />
+                                        }
+                                        onChange={date => {
+                                          todoItemContainer.changeDueDate(date);
+                                        }}
+                                      /> : null}
+                                    <ButtonWork onClick={() => {todoItemContainer.toggleDone();todoContainer.setState({update: true}) }}>{done ?'Done':'Do not'}</ButtonWork>
+                                    </ButtonGroup>
+                                  </Layout>
+                                );
+                              }}
+                            </Subscribe>
+                          );
+                        })}
+                    <ButtonGroup>
+                      <UIInput
+                        value={this.state.newName}
+                        placeholder="Add Name "
+                        onChange={newName => this.setState({ newName })}
+                        onKeyPress={event => {
+                          if (event.which === 13) {
+                            this.onClickAdd();
+                            event.target.value = "";
+                          }
+                        }}
+                      />
+
+                      <UIIcon
+                        icon="plus"
+                        size="large"
+                        onClick={this.onClickAdd}
+                      />
+                    </ButtonGroup>
+                  </Wrapper>
+                );
               }}
-            />
-
-            <UIIcon icon="plus" size="large" onClick={this.onClickAdd} />
-          </ButtonGroup>
-        </Provider>
-      </ThemeProvider>
+            </Subscribe>
+          </Provider>
+        </ThemeProvider>
+      </Background>
     );
   }
 }
-export function convertDate(inputFormat) {
-  function pad(s) {
-    return s < 10 ? "0" + s : s;
-  }
-  var d = new Date(inputFormat);
-  return [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate())].join("-");
-}
-class TodoItem extends React.Component {
-  render() {
-    return;
-  }
-}
+const Background = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 const Wrapper = styled.div`
   width: 500px;
 `;

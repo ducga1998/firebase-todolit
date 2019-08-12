@@ -39,7 +39,6 @@ class TodoContainer extends Container {
     setDueDate() {
 
     }
-
     async getTodoData() {
         const spanshot = await database.ref('/todolist').once('value')
         // console.log('todoList',todoList)
@@ -93,6 +92,14 @@ class ItemContainer extends Container {
         }, () => {
             database.ref(`/todolist/${id}`).set({
                 name,dueTime,done
+            })
+        })
+    }
+    toggleDone = () => {
+        const  {id,name,dueTime,done} = this.state
+        this.setState({done : !done } ,() => {
+            database.ref(`/todolist/${id}`).set({
+                name,dueTime,done : !done
             })
         })
     }
