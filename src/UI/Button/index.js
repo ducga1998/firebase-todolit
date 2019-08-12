@@ -27,7 +27,7 @@ const StyledButton = styled.button`
 			color: ${p => p.theme.N100};
 		}
     }
-    border-radius 
+    
 `
 export const PrimaryButton = styled(React.forwardRef((p, ref) => <StyledButton ref={ref} {...p} />)) `
 	background: ${p => p.active ? p.theme.P200 : p.theme.P100};
@@ -42,12 +42,14 @@ export const SuccessButton = styled(React.forwardRef((p, ref) => <StyledButton r
 	&& path {
 		fill: #fff;
     }
+    border-radius : 2px;
 `
 export const DangerButton = styled(React.forwardRef((p, ref) => <StyledButton ref={ref} {...p} />))`
 	background: ${p => p.active ? p.theme.R100 : p.theme.R90};
 	border: 1px solid ${p => p.active ? p.theme.R100 : p.theme.R90};
 	&& path {
 		fill: #fff;
-	}
+    }
+    border-radius : 2px;
 `
 

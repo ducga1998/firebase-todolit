@@ -26,7 +26,9 @@ class TodoList extends React.Component {
       // }
     });
   };
-
+  componentDidUpdate(){
+    todoContainer.getTodoData();
+  }
   onChangeDueDate = () => {};
   onClickAdd = async () => {
     await todoContainer.addItem(this.state.newName, false, '');
@@ -45,7 +47,7 @@ class TodoList extends React.Component {
 
                 return (
                   <Wrapper>
-                    <div>
+                    <div >
                       {["All", "Done", "DoNot"].map(item => (
                         <PrimaryButton
                           active={item === active}
@@ -91,15 +93,16 @@ class TodoList extends React.Component {
                                         icon="binCompact"
                                         size="large"
                                       />
-                                     {dueTime.length ?  <DatePicker
+                                      <DatePicker
                                         date={dueTime}
                                         trigger={
-                                          <UIIcon icon="clock" size="large" />
+                                          <UIIcon icon="clock" size="large"  />
                                         }
                                         onChange={date => {
                                           todoItemContainer.changeDueDate(date);
                                         }}
-                                      /> : null}
+                                      /> 
+                                      
                                     <ButtonWork onClick={() => {todoItemContainer.toggleDone();todoContainer.setState({update: true}) }}>{done ?'Done':'Do not'}</ButtonWork>
                                     </ButtonGroup>
                                   </Layout>
